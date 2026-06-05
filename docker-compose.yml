@@ -1,0 +1,50 @@
+services:
+  devsu-account-db:
+    image: postgres:18-alpine
+    container_name: devsu-account-db
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./data_db:/var/lib/postgresql
+    networks:
+      - devsu-fintech-network
+  devsu-account-app:
+    build: .
+    container_name: devsu-account-app
+    ports:
+      - "${APP_PORT}:8081"
+    env_file:
+      - .env
+    depends_on:
+      - devsu-account-db
+    networks:
+      - devsu-fintech-network
+  devsu-fintech-queue:
+    image: rabbitmq:3.13-management-alpine
+    container_name: devsu-fintech-queue
+    ports:
+      # Standar port for application communication (AMQP)
+      - "5672:5672"
+      # Web interface administration
+      - "15672:15672"
+    environment:
+      # Develop credentials access
+      RABBITMQ_DEFAULT_USER: ${RBQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RBQ_PASSWORD}
+    volumes:
+      # Data persistence to keep queue even if the container is down
+      - devsu-rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - devsu-fintech-network
+networks:
+  devsu-fintech-network:
+    name: devsu-fintech-network
+    driver: bridge
+    attachable: true
+volumes:
+  devsu-rabbitmq-data:
+    name: devsu-rabbitmq-data
