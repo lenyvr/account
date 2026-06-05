@@ -9,13 +9,13 @@ Microservice person-client is external and independent to this one.
       otherwise the bd will set a period time of one month by default.
     - The `client_id` field, must be verified asynchronously sending a message to a queue where microservice client can 
       read and answer, if isn't verified or client doesn't exist, the account can't be created.
-    - the `amount` field can be 0.0
+    - the `balance` field can be 0.0
     - the fields `created_date`, `last_status_date` and `last_change_date` are managed for the database. 
 - Update account:
     - Only can be updated accounts with `account_status_id` different from value 5 (`CLOSED`).
     - Only can be updated the fields `account_status_id` and `expiry_deposit_date`.
     - `account_status_id` field can't be set to status id 4 (`DORMANT`), unless the `last_change_date` value field be 
-    older than 6 months comparing with the current date and `amount` value field be in 0.
+    older than 6 months comparing with the current date and `balance` value field be in 0.
     - `account_status_id` field can't be set to status id 5 (`CLOSED`), send a response indicting that the status can't 
     be set in that service and that for that purpose there is another endpoint.
 - List accounts:
@@ -24,29 +24,30 @@ Microservice person-client is external and independent to this one.
     - The list must get the `name` attribute from the parametrized table, by the id reference in main table account, 
     for e.g., `ACTIVE` value for accounts with account_status_id value 2. 
     - It must have an optionals filters for each of the followings fields: `account_number`, `account_type`, 
-     `created_date`, `account_status`, `initial_amount` and `final_amount`.
+     `created_date`, `account_status`, `initial_balance` and `final_balance`.
 - Deactivate account:
     - Only can be deactivated accounts with `account_status_id` different from value 5 (`CLOSED`).
     - The request must include the `account_number` to be deactivated, the refund method (withdrawal or transfer, 
       if there is a balance) and the account number to which the refund amount will be transferred if the 'transfer' 
        option was chosen.
-    - If the account has in `amount` field a value > 0, a message in the response must indicate the amount that will 
-     be give to the client (with the option chosen in the request) and a transaction type id 3 
-    (`CASH_WITHDRAWAL`)  or type id 4 (`TRANSFER_OUTBOUND`) must be  registered with the amount that let in 0 the account
+    - If the account has in `balance` field a value > 0, a message in the response must indicate the amount that will 
+     be refund to the client (with the option chosen in the request) and a transaction type id 3 
+    (`CASH_WITHDRAWAL`)  or type id 4 (`TRANSFER_OUTBOUND`) must be registered with the amount that let in 0 the balance 
+      account
     - An account is inactivated changing `account_status_id` field to status id 5 (`CLOSED`).
 - Register transaction: 
     - The `amount` value can be negative (transaction types 3-`CASH_WITHDRAWAL` and  4-`TRANSFER_OUTBOUND`) or positive
       (transactions type 1-`CASH_DEPOSIT` and 2-`TRANSFER_INBOUND`).
     - The `account_id` value must be verified toward the account table records, must exist the account with that id 
       and the account encountered can't be in account_status_id 5 (`CLOSED`).
-    - The transaction can't be done if the amount value of the transaction is add to the amount value in the account 
+    - The transaction can't be done if the amount value of the transaction is add to the balance value in the account 
       and the result is less than zero. response with a friendly message indicating that the balance isn't enough.
-    - Each transaction must update the `amount` field by adding the transaction amount to the current account amount in 
+    - Each transaction must update the `balance` field by adding the transaction amount to the current account balance in 
      account table with tha corresponding `account_id` from the transaction.
 - Account status report:
     - In the request must be the client `identification_number`, `start_date`and `end_date`.
     - this report must list all transactions in that period of time, group by the number_account, account_type and
-     account_amount that belong.
+     account balance that belong.
     - the report must show client information such as: first and last name, identification_number and identification_type
     address, email and contact number.
 
