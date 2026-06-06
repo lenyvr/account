@@ -1,6 +1,7 @@
 package com.devsu.fintech.infrastructure.adapter.rest.mapper;
 
 import com.devsu.fintech.domain.model.Account;
+import com.devsu.fintech.infrastructure.adapter.rest.dto.AccountListItemDTO;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.CreateAccountRequestDTO;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.CreateAccountResponseDTO;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.UpdateAccountResponseDTO;
@@ -28,6 +29,20 @@ public class AccountMapper {
                 account.getAccountStatusId(),
                 account.getClientId(),
                 account.getAccountTypeId(),
+                account.getExpiryDepositDate(),
+                account.getCreatedDate()
+        );
+    }
+
+    public static AccountListItemDTO toListItemDTO(Account account) {
+        return new AccountListItemDTO(
+                account.getAccountId(),
+                account.getAccountNumber(),
+                account.getInitialAmount(),
+                account.getBalance(),
+                account.getAccountStatusName(),
+                account.getClientId(),
+                account.getAccountTypeName(),
                 account.getExpiryDepositDate(),
                 account.getCreatedDate()
         );

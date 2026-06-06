@@ -81,7 +81,7 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
 - [x] Implement "Update Account" Use Case:
     - Follow Hexagonal layers. Enforce the business rules avoiding manual state changes to DORMANT or CLOSED.
 
-- [ ] Implement "List Accounts" Use Case:
+- [x] Implement "List Accounts" Use Case:
     - Build a dynamic query mechanism (e.g., JPA Specifications or QueryDSL) to handle the optional filters and pagination.
     - Map the lookup IDs to their readable String names in the Response DTO.
 

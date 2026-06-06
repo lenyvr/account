@@ -1,12 +1,23 @@
 package com.devsu.fintech.infrastructure.adapter.jpa;
 
 import com.devsu.fintech.domain.model.Account;
+import com.devsu.fintech.domain.model.AccountFilter;
+import com.devsu.fintech.domain.model.AccountPage;
 import com.devsu.fintech.domain.ports.output.AccountRepositorySPI;
 import com.devsu.fintech.infrastructure.adapter.jpa.entity.AccountEntity;
+import com.devsu.fintech.infrastructure.adapter.jpa.entity.AccountStatusEntity;
+import com.devsu.fintech.infrastructure.adapter.jpa.entity.AccountTypeEntity;
 import com.devsu.fintech.infrastructure.adapter.jpa.repository.AccountJpaRepository;
+import com.devsu.fintech.infrastructure.adapter.jpa.repository.AccountStatusJpaRepository;
+import com.devsu.fintech.infrastructure.adapter.jpa.repository.AccountTypeJpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class AccountRepositoryAdapter implements AccountRepositorySPI {
@@ -14,9 +25,15 @@ public class AccountRepositoryAdapter implements AccountRepositorySPI {
     private static final int CLOSED_STATUS_ID = 5;
 
     private final AccountJpaRepository jpaRepository;
+    private final AccountTypeJpaRepository accountTypeRepository;
+    private final AccountStatusJpaRepository accountStatusRepository;
 
-    public AccountRepositoryAdapter(AccountJpaRepository jpaRepository) {
+    public AccountRepositoryAdapter(AccountJpaRepository jpaRepository,
+                                    AccountTypeJpaRepository accountTypeRepository,
+                                    AccountStatusJpaRepository accountStatusRepository) {
         this.jpaRepository = jpaRepository;
+        this.accountTypeRepository = accountTypeRepository;
+        this.accountStatusRepository = accountStatusRepository;
     }
 
     @Override
@@ -39,6 +56,62 @@ public class AccountRepositoryAdapter implements AccountRepositorySPI {
     public Account update(Account account) {
         AccountEntity saved = jpaRepository.save(toEntity(account));
         return toDomain(saved);
+    }
+
+    @Override
+    public AccountPage listAccounts(AccountFilter filter, int page, int size) {
+        Map<Integer, String> typeNames = accountTypeRepository.findAll().stream()
+                .collect(Collectors.toMap(AccountTypeEntity::getAccountTypeId, AccountTypeEntity::getName));
+        Map<Integer, String> statusNames = accountStatusRepository.findAll().stream()
+                .collect(Collectors.toMap(AccountStatusEntity::getAccountStatusId, AccountStatusEntity::getName));
+
+        Specification<AccountEntity> spec = AccountSpecification.excludeClosed();
+
+        if (filter.accountNumber() != null) {
+            spec = spec.and(AccountSpecification.accountNumberEquals(filter.accountNumber()));
+        }
+        if (filter.accountType() != null) {
+            Integer typeId = resolveId(typeNames, filter.accountType());
+            if (typeId != null) spec = spec.and(AccountSpecification.typeIdEquals(typeId));
+        }
+        if (filter.accountStatus() != null) {
+            Integer statusId = resolveId(statusNames, filter.accountStatus());
+            if (statusId != null) spec = spec.and(AccountSpecification.statusIdEquals(statusId));
+        }
+        if (filter.createdDate() != null) {
+            spec = spec.and(AccountSpecification.createdOnDate(filter.createdDate()));
+        }
+        if (filter.initialBalance() != null) {
+            spec = spec.and(AccountSpecification.balanceGreaterThanOrEqual(filter.initialBalance()));
+        }
+        if (filter.finalBalance() != null) {
+            spec = spec.and(AccountSpecification.balanceLessThanOrEqual(filter.finalBalance()));
+        }
+
+        Page<AccountEntity> resultPage = jpaRepository.findAll(spec, PageRequest.of(page, size));
+        java.util.List<Account> accounts = resultPage.getContent().stream()
+                .map(entity -> toDomainWithNames(entity, typeNames, statusNames))
+                .collect(Collectors.toList());
+
+        return new AccountPage(accounts, resultPage.getTotalElements(),
+                resultPage.getTotalPages(), resultPage.getNumber(), size);
+    }
+
+    private Integer resolveId(Map<Integer, String> nameMap, String name) {
+        return nameMap.entrySet().stream()
+                .filter(e -> e.getValue().equalsIgnoreCase(name))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Account toDomainWithNames(AccountEntity entity,
+                                      Map<Integer, String> typeNames,
+                                      Map<Integer, String> statusNames) {
+        Account account = toDomain(entity);
+        account.setAccountTypeName(typeNames.get(entity.getAccountTypeId()));
+        account.setAccountStatusName(statusNames.get(entity.getAccountStatusId()));
+        return account;
     }
 
     private AccountEntity toEntity(Account account) {
