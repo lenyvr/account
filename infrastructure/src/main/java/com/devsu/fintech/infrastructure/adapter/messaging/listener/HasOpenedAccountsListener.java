@@ -24,6 +24,6 @@ public class HasOpenedAccountsListener {
         log.info("RPC request received - checking open accounts for client_id: {}", request.clientId());
         boolean result = hasOpenedAccountsInputPort.execute(request.clientId());
         log.info("Client {} has opened accounts: {}", request.clientId(), result);
-        return new CheckAccountResponseDTO(result);
+        return new CheckAccountResponseDTO(request.clientId(), result);
     }
 }

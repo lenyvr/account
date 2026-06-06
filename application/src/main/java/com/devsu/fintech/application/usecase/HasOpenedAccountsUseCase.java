@@ -12,7 +12,7 @@ public class HasOpenedAccountsUseCase implements HasOpenedAccountsInputPort {
     }
 
     @Override
-    public boolean execute(Integer clientId) {
+    public boolean execute(Long clientId) {
         return accountRepositorySPI.hasOpenedAccounts(clientId);
     }
 }
