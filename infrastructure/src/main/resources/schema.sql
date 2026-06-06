@@ -5,10 +5,10 @@ CREATE OR REPLACE FUNCTION public.fill_account_backup_fn()
 AS $function$
 BEGIN
     INSERT INTO public.account_backup
-    (account_id, account_number, initial_amount
+    (account_id, account_number, initial_amount, balance
     , account_status_name, client_id, account_type_name, created_date
     , last_status_date, last_change_date, date_inserted, expiry_deposit_date)
-    VALUES( OLD.account_id, OLD.account_number, OLD.initial_amount
+    VALUES( OLD.account_id, OLD.account_number, OLD.initial_amount, OLD.balance
           , (select name from account_status where account_status_id = OLD.account_status_id)
           , OLD.client_id
           , (select name from account_type where account_type_id = OLD.account_type_id)
@@ -24,7 +24,7 @@ CREATE OR REPLACE FUNCTION public.update_account_dates_fn()
 AS $function$
 BEGIN
     IF NEW.initial_amount IS DISTINCT FROM OLD.initial_amount
-		OR NEW.amount IS DISTINCT FROM OLD.amount
+		OR NEW.balance IS DISTINCT FROM OLD.balance
 		OR NEW.account_status_id IS DISTINCT FROM OLD.account_status_id
 	THEN
         NEW.last_change_date := NOW();
@@ -79,10 +79,10 @@ CREATE TABLE IF NOT EXISTS account_backup (
    client_id int4 NOT NULL,
    account_type_name varchar(20) NOT NULL,
    expiry_deposit_date date NULL,
-   created_date date DEFAULT now() NOT NULL,
-   last_status_date date NOT NULL,
-   last_change_date date NOT NULL,
-   date_inserted date DEFAULT now() NOT NULL
+   created_date TIMESTAMPTZ DEFAULT now() NOT NULL,
+   last_status_date TIMESTAMPTZ NOT NULL,
+   last_change_date TIMESTAMPTZ NOT NULL,
+   date_inserted TIMESTAMPTZ DEFAULT now() NOT NULL
 );@@
 
 CREATE TABLE IF NOT EXISTS transaction_type (
@@ -102,9 +102,9 @@ CREATE TABLE IF NOT EXISTS account (
     client_id int4 NOT NULL,
     account_type_id int4 NOT NULL,
     expiry_deposit_date date NULL,
-    created_date date DEFAULT now() NOT NULL,
-    last_status_date date DEFAULT now() NOT NULL,
-    last_change_date date DEFAULT now() NOT NULL,
+    created_date TIMESTAMPTZ DEFAULT now() NOT NULL,
+    last_status_date TIMESTAMPTZ DEFAULT now() NOT NULL,
+    last_change_date TIMESTAMPTZ DEFAULT now() NOT NULL,
     CONSTRAINT account_pk PRIMARY KEY (account_id),
     CONSTRAINT account_unique UNIQUE (account_number),
     CONSTRAINT account_account_status_fk FOREIGN KEY (account_status_id) REFERENCES public.account_status(account_status_id),
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS account (
 
 CREATE TABLE IF NOT EXISTS transaction (
       transaction_id serial4 NOT NULL,
-      transaction_date date DEFAULT now() NOT NULL,
+      transaction_date TIMESTAMPTZ DEFAULT now() NOT NULL,
       amount numeric NOT NULL,
       account_number_destination varchar(34) null,
       transaction_type_id int4 NOT NULL,
