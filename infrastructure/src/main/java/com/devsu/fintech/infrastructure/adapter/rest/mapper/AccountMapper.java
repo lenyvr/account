@@ -3,6 +3,7 @@ package com.devsu.fintech.infrastructure.adapter.rest.mapper;
 import com.devsu.fintech.domain.model.Account;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.CreateAccountRequestDTO;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.CreateAccountResponseDTO;
+import com.devsu.fintech.infrastructure.adapter.rest.dto.UpdateAccountResponseDTO;
 
 public class AccountMapper {
 
@@ -29,6 +30,22 @@ public class AccountMapper {
                 account.getAccountTypeId(),
                 account.getExpiryDepositDate(),
                 account.getCreatedDate()
+        );
+    }
+
+    public static UpdateAccountResponseDTO toUpdateResponseDTO(Account account) {
+        return new UpdateAccountResponseDTO(
+                account.getAccountId(),
+                account.getAccountNumber(),
+                account.getInitialAmount(),
+                account.getBalance(),
+                account.getAccountStatusId(),
+                account.getClientId(),
+                account.getAccountTypeId(),
+                account.getExpiryDepositDate(),
+                account.getCreatedDate(),
+                account.getLastStatusDate(),
+                account.getLastChangeDate()
         );
     }
 }
