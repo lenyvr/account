@@ -56,8 +56,6 @@ class AccountControllerTest {
             .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-    // ---- POST /accounts ----
-
     @Test
     void shouldReturn201WhenAccountCreatedSuccessfully() throws Exception {
         when(createAccountInputPort.execute(any())).thenReturn(buildSavedAccount());
