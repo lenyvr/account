@@ -1,14 +1,18 @@
 package com.devsu.fintech.infrastructure.adapter.rest;
 
 import com.devsu.fintech.application.port.input.CreateAccountInputPort;
+import com.devsu.fintech.application.port.input.DeactivateAccountInputPort;
 import com.devsu.fintech.application.port.input.ListAccountsInputPort;
 import com.devsu.fintech.application.port.input.UpdateAccountInputPort;
 import com.devsu.fintech.domain.model.Account;
 import com.devsu.fintech.domain.model.AccountFilter;
 import com.devsu.fintech.domain.model.AccountPage;
+import com.devsu.fintech.domain.model.DeactivationResult;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.AccountListItemDTO;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.CreateAccountRequestDTO;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.CreateAccountResponseDTO;
+import com.devsu.fintech.infrastructure.adapter.rest.dto.DeactivateAccountRequestDTO;
+import com.devsu.fintech.infrastructure.adapter.rest.dto.DeactivateAccountResponseDTO;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.PagedResponseDTO;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.UpdateAccountRequestDTO;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.UpdateAccountResponseDTO;
@@ -18,6 +22,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,13 +45,16 @@ public class AccountController {
     private final CreateAccountInputPort createAccountInputPort;
     private final UpdateAccountInputPort updateAccountInputPort;
     private final ListAccountsInputPort listAccountsInputPort;
+    private final DeactivateAccountInputPort deactivateAccountInputPort;
 
     public AccountController(CreateAccountInputPort createAccountInputPort,
                              UpdateAccountInputPort updateAccountInputPort,
-                             ListAccountsInputPort listAccountsInputPort) {
+                             ListAccountsInputPort listAccountsInputPort,
+                             DeactivateAccountInputPort deactivateAccountInputPort) {
         this.createAccountInputPort = createAccountInputPort;
         this.updateAccountInputPort = updateAccountInputPort;
         this.listAccountsInputPort = listAccountsInputPort;
+        this.deactivateAccountInputPort = deactivateAccountInputPort;
     }
 
     @GetMapping
@@ -98,5 +106,18 @@ public class AccountController {
         Account updated = updateAccountInputPort.execute(
                 accountNumber, request.accountStatusId(), request.expiryDepositDate());
         return AccountMapper.toUpdateResponseDTO(updated);
+    }
+
+    @DeleteMapping("/{accountNumber}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Deactivate (close) an account and optionally refund balance, possible value for refund method: withdrawal/transfer")
+    @ApiResponse(responseCode = "200", description = "Account deactivated successfully")
+    @ApiResponse(responseCode = "404", description = "Account not found")
+    @ApiResponse(responseCode = "422", description = "Business rule violation")
+    public DeactivateAccountResponseDTO deactivateAccount(@PathVariable String accountNumber,
+                                                          @RequestBody DeactivateAccountRequestDTO request) {
+        DeactivationResult result = deactivateAccountInputPort.execute(
+                accountNumber, request.refundMethod(), request.targetAccountNumber());
+        return AccountMapper.toDeactivateResponseDTO(result);
     }
 }

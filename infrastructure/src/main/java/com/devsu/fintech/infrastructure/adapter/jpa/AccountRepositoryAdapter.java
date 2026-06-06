@@ -3,17 +3,21 @@ package com.devsu.fintech.infrastructure.adapter.jpa;
 import com.devsu.fintech.domain.model.Account;
 import com.devsu.fintech.domain.model.AccountFilter;
 import com.devsu.fintech.domain.model.AccountPage;
+import com.devsu.fintech.domain.model.Transaction;
 import com.devsu.fintech.domain.ports.output.AccountRepositorySPI;
 import com.devsu.fintech.infrastructure.adapter.jpa.entity.AccountEntity;
 import com.devsu.fintech.infrastructure.adapter.jpa.entity.AccountStatusEntity;
 import com.devsu.fintech.infrastructure.adapter.jpa.entity.AccountTypeEntity;
+import com.devsu.fintech.infrastructure.adapter.jpa.entity.TransactionEntity;
 import com.devsu.fintech.infrastructure.adapter.jpa.repository.AccountJpaRepository;
 import com.devsu.fintech.infrastructure.adapter.jpa.repository.AccountStatusJpaRepository;
 import com.devsu.fintech.infrastructure.adapter.jpa.repository.AccountTypeJpaRepository;
+import com.devsu.fintech.infrastructure.adapter.jpa.repository.TransactionJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Optional;
@@ -27,13 +31,16 @@ public class AccountRepositoryAdapter implements AccountRepositorySPI {
     private final AccountJpaRepository jpaRepository;
     private final AccountTypeJpaRepository accountTypeRepository;
     private final AccountStatusJpaRepository accountStatusRepository;
+    private final TransactionJpaRepository transactionJpaRepository;
 
     public AccountRepositoryAdapter(AccountJpaRepository jpaRepository,
                                     AccountTypeJpaRepository accountTypeRepository,
-                                    AccountStatusJpaRepository accountStatusRepository) {
+                                    AccountStatusJpaRepository accountStatusRepository,
+                                    TransactionJpaRepository transactionJpaRepository) {
         this.jpaRepository = jpaRepository;
         this.accountTypeRepository = accountTypeRepository;
         this.accountStatusRepository = accountStatusRepository;
+        this.transactionJpaRepository = transactionJpaRepository;
     }
 
     @Override
@@ -95,6 +102,25 @@ public class AccountRepositoryAdapter implements AccountRepositorySPI {
 
         return new AccountPage(accounts, resultPage.getTotalElements(),
                 resultPage.getTotalPages(), resultPage.getNumber(), size);
+    }
+
+    @Override
+    @Transactional
+    public Account deactivate(Account account, Transaction refundTransaction) {
+        if (refundTransaction != null) {
+            transactionJpaRepository.save(toTransactionEntity(refundTransaction));
+        }
+        AccountEntity saved = jpaRepository.save(toEntity(account));
+        return toDomain(saved);
+    }
+
+    private TransactionEntity toTransactionEntity(Transaction tx) {
+        TransactionEntity entity = new TransactionEntity();
+        entity.setAccountId(tx.getAccountId());
+        entity.setAmount(tx.getAmount());
+        entity.setTransactionTypeId(tx.getTransactionTypeId());
+        entity.setAccountNumberDestination(tx.getAccountNumberDestination());
+        return entity;
     }
 
     private Integer resolveId(Map<Integer, String> nameMap, String name) {
