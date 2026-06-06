@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "account")
@@ -41,13 +42,13 @@ public class AccountEntity {
     private LocalDate expiryDepositDate;
 
     @Column(name = "created_date", insertable = false, updatable = false)
-    private LocalDateTime createdDate;
+    private OffsetDateTime createdDate;
 
     @Column(name = "last_status_date", insertable = false, updatable = false)
-    private LocalDateTime lastStatusDate;
+    private OffsetDateTime lastStatusDate;
 
     @Column(name = "last_change_date", insertable = false, updatable = false)
-    private LocalDateTime lastChangeDate;
+    private OffsetDateTime lastChangeDate;
 
     public Long getAccountId() { return accountId; }
     public void setAccountId(Long accountId) { this.accountId = accountId; }
@@ -73,7 +74,7 @@ public class AccountEntity {
     public LocalDate getExpiryDepositDate() { return expiryDepositDate; }
     public void setExpiryDepositDate(LocalDate expiryDepositDate) { this.expiryDepositDate = expiryDepositDate; }
 
-    public LocalDateTime getCreatedDate() { return createdDate; }
-    public LocalDateTime getLastStatusDate() { return lastStatusDate; }
-    public LocalDateTime getLastChangeDate() { return lastChangeDate; }
+    public OffsetDateTime getCreatedDate() { return createdDate; }
+    public OffsetDateTime getLastStatusDate() { return lastStatusDate; }
+    public OffsetDateTime getLastChangeDate() { return lastChangeDate; }
 }
