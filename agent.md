@@ -54,28 +54,55 @@ Kotlin DSL and Docker).
 - **account_backup**: Backup table for register account table changes. ignore this table, it will be manage by database.
 
 ## 2. Roadmap and Upcoming Use Cases
-*Agent: Break down here the technical steps (ports, use cases, adapters, beans) for the requirements that I will request.*
+*Agent: Break down here the technical steps (ports, use cases, adapters, beans) for the requirements that I will request. 
+Always strictly follow Hexagonal Architecture principles (Domain, Application, Infrastructure).*
+
 **Tasks to be done:**
+
 - [ ] Create `hasOpenedAccounts` RabbitMQ Listener: This service must act as an RPC Consumer to check a client's 
-      account status.
-    - **1. DTO Creation:** First, create the necessary `RequestDTO` (containing a `client_id` number) and a 
-          `ResponseDTO` (containing a boolean result or appropriate structure) to handle the message payload cleanly.
-    - **2. Database Check:** The listener must extract the `client_id` and verify in the database (using Spring Data 
-           JPA) if the client has any associated accounts with an `account_status_id` different from `5` (`CLOSED`).
+   account status.
+    - **1. DTO Creation:** Create the `RequestDTO` (containing a `client_id` number) and a `ResponseDTO` 
+        (boolean result) to handle the message payload.
+    - **2. Database Check:** Extract the `client_id` and verify in the database (via JPA Repository) if the client 
+         has any accounts with an `account_status_id` different from `5` (`CLOSED`).
     - **3. Infrastructure Details:**
         - Pattern: RPC (Request-Reply)
         - Exchange: `accounts.exchange` (DirectExchange)
         - Request Queue (to listen): `accounts.check-request`
         - Response Queue (target for reply): `client.deactivation-response`
-    - **4. Expected Behavior:** Use `@RabbitListener` on the request queue. The method must return the `ResponseDTO`
-          with the result. Rely on Spring Boot's automatic reply routing to send the returned object directly to the 
-          response queue without calling `RabbitTemplate` manually.
-- [ ] Create account
-- [ ] Update account
-- [ ] List accounts
-- [ ] Deactivate account
-- [ ] Register transaction
-- [ ] Generate account report
+    - **4. Expected Behavior:** Use `@RabbitListener` on the request queue. Return the `ResponseDTO` and rely on 
+           Spring Boot's automatic routing for the reply.
+
+- [ ] Implement "Create Account" Use Case:
+    - Create the Domain Model, Input Port (UseCase interface), and Output Port (Repository interface).
+    - Implement the logic to send an RPC message to verify `client_id` existence.
+    - Create the REST Controller (Web Adapter) and JPA Adapter.
+
+- [ ] Implement "Update Account" Use Case:
+    - Follow Hexagonal layers. Enforce the business rules avoiding manual state changes to DORMANT or CLOSED.
+
+- [ ] Implement "List Accounts" Use Case:
+    - Build a dynamic query mechanism (e.g., JPA Specifications or QueryDSL) to handle the optional filters and pagination.
+    - Map the lookup IDs to their readable String names in the Response DTO.
+
+- [ ] Implement "Deactivate Account" Use Case:
+    - Implement a transactional boundary (`@Transactional`).
+    - Handle the zero-balance enforcement by generating the corresponding withdrawal/transfer transaction before 
+      changing the status to CLOSED.
+
+- [ ] Implement "Register Transaction" Use Case:
+    - Handle concurrency safely when updating the account balance.
+    - Validate sufficient funds and account status before saving the transaction.
+
+- [ ] Implement "Generate Account Report" Use Case:
+    - **DTO Structure:**
+        - *Level 1:* `client_name` (first + last), `client_identification_number`, `client_contact_number`, `client_email`.
+        - *Level 2:* `account_number`, `account_type` (name), `balance`, `account_status` (name).
+        - *Level 3:* `transaction_date`, `transaction_type` (name), `transaction_amount`, `transaction_description`.
+  - **Integration:** Fetch the Level 1 data (Client details) by implementing a RabbitMQ RPC (Request-Reply) call to 
+  the Client Microservice. The service must send a message containing the `client_identification_number` creating a 
+  exchange/queue, and synchronously wait for the response payload to map the client's details into the 
+  report DTO.
 
 ## 3. Technical Decisions Made
 *Record here any significant changes to the code, custom exceptions, mappers, or design patterns used.*

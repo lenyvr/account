@@ -45,8 +45,8 @@ AS $function$
 BEGIN
     IF NEW.account_type_id = 3 AND NEW.expiry_deposit_date IS NULL THEN
         NEW.expiry_deposit_date := NOW() + INTERVAL '1 month';
-    ELSE
-        NEW.expiry_date := NULL;
+    ELSIF NEW.account_type_id <> 3 THEN
+        NEW.expiry_deposit_date := NULL;
     END IF;
     RETURN NEW;
 END

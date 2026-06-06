@@ -2,54 +2,63 @@
 This project manage the bank customer accounts and its transactions. 
 Microservice person-client is external and independent to this one.
 
-## Use cases
-- Create account:
-    - the number account is sent in the request
-    - if an account is the type `TIME_DEPOSIT` (which id is 3), the field `expiry_deposit_date` should be filled, 
-      otherwise the bd will set a period time of one month by default.
-    - The `client_id` field, must be verified asynchronously sending a message to a queue where microservice client can 
-      read and answer, if isn't verified or client doesn't exist, the account can't be created.
-    - the `balance` field can be 0.0
-    - the fields `created_date`, `last_status_date` and `last_change_date` are managed for the database. 
-- Update account:
-    - Only can be updated accounts with `account_status_id` different from value 5 (`CLOSED`).
-    - Only can be updated the fields `account_status_id` and `expiry_deposit_date`.
-    - `account_status_id` field can't be set to status id 4 (`DORMANT`), unless the `last_change_date` value field be 
-    older than 6 months comparing with the current date and `balance` value field be in 0.
-    - `account_status_id` field can't be set to status id 5 (`CLOSED`), send a response indicting that the status can't 
-    be set in that service and that for that purpose there is another endpoint.
-- List accounts:
-    - Only can be listed accounts with `account_status_id` different from value 5 (`CLOSED`).
-    - The list should be paginated.
-    - The list must get the `name` attribute from the parametrized table, by the id reference in main table account, 
-    for e.g., `ACTIVE` value for accounts with account_status_id value 2. 
-    - It must have an optionals filters for each of the followings fields: `account_number`, `account_type`, 
-     `created_date`, `account_status`, `initial_balance` and `final_balance`.
-- Deactivate account:
-    - Only can be deactivated accounts with `account_status_id` different from value 5 (`CLOSED`).
-    - The request must include the `account_number` to be deactivated, the refund method (withdrawal or transfer, 
-      if there is a balance) and the account number to which the refund amount will be transferred if the 'transfer' 
-       option was chosen.
-    - If the account has in `balance` field a value > 0, a message in the response must indicate the amount that will 
-     be refund to the client (with the option chosen in the request) and a transaction type id 3 
-    (`CASH_WITHDRAWAL`)  or type id 4 (`TRANSFER_OUTBOUND`) must be registered with the amount that let in 0 the balance 
-      account
-    - An account is inactivated changing `account_status_id` field to status id 5 (`CLOSED`).
-- Register transaction: 
-    - The `amount` value can be negative (transaction types 3-`CASH_WITHDRAWAL` and  4-`TRANSFER_OUTBOUND`) or positive
-      (transactions type 1-`CASH_DEPOSIT` and 2-`TRANSFER_INBOUND`).
-    - The `account_id` value must be verified toward the account table records, must exist the account with that id 
-      and the account encountered can't be in account_status_id 5 (`CLOSED`).
-    - The transaction can't be done if the amount value of the transaction is add to the balance value in the account 
-      and the result is less than zero. response with a friendly message indicating that the balance isn't enough.
-    - Each transaction must update the `balance` field by adding the transaction amount to the current account balance in 
-     account table with tha corresponding `account_id` from the transaction.
-- Account status report:
-    - In the request must be the client `identification_number`, `start_date`and `end_date`.
-    - this report must list all transactions in that period of time, group by the number_account, account_type and
-     account balance that belong.
-    - the report must show client information such as: first and last name, identification_number and identification_type
-    address, email and contact number.
+## Use Cases & Business Rules
+
+- **Create account:**
+    - The `account_number` is sent in the request.
+    - The `client_id` field must be verified by sending a Request-Reply (RPC) message via RabbitMQ to the Client 
+      microservice. If the client doesn't exist or isn't verified, the account creation must be aborted.
+    - If the account type is `TIME_DEPOSIT` (ID 3), the client can optionally provide the `expiry_deposit_date` in the 
+     request. If it is provided, save it. If it is not provided (null), the database trigger will automatically set it 
+     to one month from the current date. For any other account types, this field must remain null. *(Note for JPA: 
+     Ensure `expiry_deposit_date` is insertable, but keep `created_date`, `last_status_date`, and `last_change_date` 
+      as `@Column(insertable = false, updatable = false)`)*.
+    - The `balance` field is sent in the request, can start at 0.0.
+    - The fields `created_date`, `last_status_date`, and `last_change_date` are strictly managed by the database. 
+      Use `@Column(insertable = false, updatable = false)` in the JPA entity to prevent Hibernate from overriding them.
+
+- **Update account:**
+    - Accounts can only be updated if their `account_status_id` is different from 5 (`CLOSED`).
+    - Only `account_status_id` and `expiry_deposit_date` fields are allowed to be updated.
+    - The `account_status_id` cannot be set to 4 (`DORMANT`) manually, unless the `last_change_date` is older than 6 
+      months compared to the current date AND the `balance` is 0.
+    - The `account_status_id` cannot be set to 5 (`CLOSED`) through this use case. If attempted, return a friendly 
+       response indicating that account closure must be handled by the specific "Deactivate Account" endpoint.
+
+- **List accounts:**
+    - Only list accounts with `account_status_id` different from 5 (`CLOSED`).
+    - The response must be paginated, number of records can be sent in the request, if not, default to 10 records per page.
+    - The list must resolve the `name` attribute from the catalog/lookup tables using the ID references 
+      (e.g., return "ACTIVE" instead of just ID 2 for the status).
+    - Implement optional filtering parameters for: `account_number`, `account_type`, `created_date`, `account_status`, 
+      `initial_balance`, and `final_balance`.
+
+- **Deactivate account:**
+    - Only accounts with `account_status_id` different from 5 (`CLOSED`) can be deactivated.
+    - The request must include the `account_number`, the refund method (`withdrawal` or `transfer` if there is a 
+       remaining balance), and the target account number if `transfer` was chosen.
+    - If the account `balance` > 0, the response must indicate the refunded amount. The system must register a 
+      transaction of type 3 (`CASH_WITHDRAWAL`) or 4 (`TRANSFER_OUTBOUND`) with the exact amount to bring the account 
+      balance to 0.
+    - The account is officially deactivated by changing the `account_status_id` to 5 (`CLOSED`).
+
+- **Register transaction:**
+    - The `amount` value can be negative (transaction types 3-`CASH_WITHDRAWAL` and 4-`TRANSFER_OUTBOUND`) or 
+       positive (transaction types 1-`CASH_DEPOSIT` and 2-`TRANSFER_INBOUND`).
+    - The `account_id` must be validated against the database. The account must exist and its `account_status_id` 
+       cannot be 5 (`CLOSED`).
+    - The transaction cannot be processed if the resulting balance drops below zero. In this case, 
+      return a friendly error message indicating insufficient funds.
+    - Each transaction must update the `balance` field in the account table by adding/subtracting the transaction amount. 
+      Ensure proper transaction isolation (ACID).
+
+- **Account status report:**
+    - The request must include: `client_identification_number`, `start_date`, and `end_date`.
+    - The report must list all transactions within the time period, grouped by `account_number`, `account_type`, 
+       and their respective balances.
+    - The report must include the client's information (First name, last name, identification number, identification 
+       type, address, email, and contact number). *Note: Since this microservice only holds `client_id`, 
+       use an RPC RabbitMQ call to fetch this data from the Client microservice.*
 
 # Project Instructions and Coding Guidelines
 You are an expert programming assistant in Java 21, Spring Boot, and Hexagonal Architecture. Your goal is to help develop this microservice while maintaining a strict separation of concerns.
