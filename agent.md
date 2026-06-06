@@ -90,7 +90,7 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
     - Handle the zero-balance enforcement by generating the corresponding withdrawal/transfer transaction before 
       changing the status to CLOSED.
 
-- [ ] Implement "Register Transaction" Use Case:
+- [x] Implement "Register Transaction" Use Case:
     - Handle concurrency safely when updating the account balance.
     - Validate sufficient funds and account status before saving the transaction.
 
