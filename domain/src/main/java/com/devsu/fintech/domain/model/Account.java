@@ -1,51 +1,20 @@
-package com.devsu.fintech.infrastructure.adapter.jpa.entity;
+package com.devsu.fintech.domain.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "account")
-public class AccountEntity {
+public class Account {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "account_id")
     private Long accountId;
-
-    @Column(name = "account_number", unique = true, nullable = false)
     private String accountNumber;
-
-    @Column(name = "initial_amount", nullable = false)
     private BigDecimal initialAmount;
-
-    @Column(name = "balance", nullable = false)
     private BigDecimal balance;
-
-    @Column(name = "account_status_id", nullable = false)
     private Integer accountStatusId;
-
-    @Column(name = "client_id", nullable = false)
     private Long clientId;
-
-    @Column(name = "account_type_id", nullable = false)
     private Integer accountTypeId;
-
-    @Column(name = "expiry_deposit_date")
     private LocalDate expiryDepositDate;
-
-    @Column(name = "created_date", insertable = false, updatable = false)
     private LocalDate createdDate;
-
-    @Column(name = "last_status_date", insertable = false, updatable = false)
     private LocalDate lastStatusDate;
-
-    @Column(name = "last_change_date", insertable = false, updatable = false)
     private LocalDate lastChangeDate;
 
     public Long getAccountId() { return accountId; }
@@ -73,6 +42,11 @@ public class AccountEntity {
     public void setExpiryDepositDate(LocalDate expiryDepositDate) { this.expiryDepositDate = expiryDepositDate; }
 
     public LocalDate getCreatedDate() { return createdDate; }
+    public void setCreatedDate(LocalDate createdDate) { this.createdDate = createdDate; }
+
     public LocalDate getLastStatusDate() { return lastStatusDate; }
+    public void setLastStatusDate(LocalDate lastStatusDate) { this.lastStatusDate = lastStatusDate; }
+
     public LocalDate getLastChangeDate() { return lastChangeDate; }
+    public void setLastChangeDate(LocalDate lastChangeDate) { this.lastChangeDate = lastChangeDate; }
 }

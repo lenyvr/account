@@ -1,8 +1,10 @@
+server:
+  port: ${APP_PORT}
 spring:
   application:
     name: account
   datasource:
-    url: jdbc:postgresql://devsu-account-db:5432/${DB_NAME}
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -20,6 +22,11 @@ spring:
     port: ${RBQ_PORT}
     username: ${RBQ_USER}
     password: ${RBQ_PASSWORD}
+
+rabbitmq:
+  clients:
+    exchange: clients.exchange
+    verify-routing-key: clients.verify-request
   sql:
     init:
       # Run schema.sql (DDL) and data.sql (catalogs + demo data) on startup.

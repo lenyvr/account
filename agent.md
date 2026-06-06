@@ -73,7 +73,7 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
     - **4. Expected Behavior:** Use `@RabbitListener` on the request queue. Return the `ResponseDTO` and rely on 
            Spring Boot's automatic routing for the reply.
 
-- [ ] Implement "Create Account" Use Case:
+- [x] Implement "Create Account" Use Case:
     - Create the Domain Model, Input Port (UseCase interface), and Output Port (Repository interface).
     - Implement the logic to send an RPC message to verify `client_id` existence.
     - Create the REST Controller (Web Adapter) and JPA Adapter.
