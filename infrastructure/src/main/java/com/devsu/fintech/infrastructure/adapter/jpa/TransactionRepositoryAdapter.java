@@ -3,6 +3,9 @@ package com.devsu.fintech.infrastructure.adapter.jpa;
 import com.devsu.fintech.domain.model.Account;
 import com.devsu.fintech.domain.model.Transaction;
 import com.devsu.fintech.domain.ports.output.TransactionRepositorySPI;
+
+import java.time.OffsetDateTime;
+import java.util.List;
 import com.devsu.fintech.infrastructure.adapter.jpa.entity.AccountEntity;
 import com.devsu.fintech.infrastructure.adapter.jpa.entity.TransactionEntity;
 import com.devsu.fintech.infrastructure.adapter.jpa.repository.AccountJpaRepository;
@@ -34,6 +37,14 @@ public class TransactionRepositoryAdapter implements TransactionRepositorySPI {
         accountJpaRepository.save(accountEntity);
         TransactionEntity saved = transactionJpaRepository.save(toEntity(transaction));
         return toDomain(saved);
+    }
+
+    @Override
+    public List<Transaction> findTransactionsForReport(List<Long> accountIds, OffsetDateTime from, OffsetDateTime to) {
+        return transactionJpaRepository.findTransactionsForReport(accountIds, from, to)
+                .stream()
+                .map(this::toDomain)
+                .toList();
     }
 
     private TransactionEntity toEntity(Transaction tx) {

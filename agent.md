@@ -94,7 +94,7 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
     - Handle concurrency safely when updating the account balance.
     - Validate sufficient funds and account status before saving the transaction.
 
-- [ ] Implement "Generate Account Report" Use Case:
+- [x] Implement "Generate Account Report" Use Case:
     - **DTO Structure:**
         - *Level 1:* `client_name` (first + last), `client_identification_number`, `client_contact_number`, `client_email`.
         - *Level 2:* `account_number`, `account_type` (name), `balance`, `account_status` (name).

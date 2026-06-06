@@ -35,3 +35,4 @@ rabbitmq:
   clients:
     exchange: clients.exchange
     verify-routing-key: clients.verify-request
+    report-routing-key: clients.report-request

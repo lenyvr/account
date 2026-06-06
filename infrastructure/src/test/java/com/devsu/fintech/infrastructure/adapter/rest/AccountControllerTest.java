@@ -85,7 +85,7 @@ class AccountControllerTest {
     }
 
     @Test
-    void shouldReturn422WhenClientNotFound() throws Exception {
+    void shouldReturn404WhenClientNotFound() throws Exception {
         when(createAccountInputPort.execute(any())).thenThrow(new ClientNotFoundException(99L));
 
         mockMvc.perform(post("/accounts")
@@ -98,7 +98,7 @@ class AccountControllerTest {
                                     "accountTypeId": 1
                                 }
                                 """))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").exists());
     }
 
