@@ -2,6 +2,8 @@ package com.devsu.fintech.infrastructure.adapter.jpa;
 
 import com.devsu.fintech.infrastructure.adapter.jpa.entity.AccountEntity;
 import com.devsu.fintech.infrastructure.adapter.jpa.repository.AccountJpaRepository;
+import com.devsu.fintech.infrastructure.adapter.jpa.repository.AccountStatusJpaRepository;
+import com.devsu.fintech.infrastructure.adapter.jpa.repository.AccountTypeJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +46,17 @@ class AccountRepositoryAdapterTest {
     @Autowired
     private AccountJpaRepository accountJpaRepository;
 
+    @Autowired
+    private AccountTypeJpaRepository accountTypeRepository;
+
+    @Autowired
+    private AccountStatusJpaRepository accountStatusRepository;
+
     private AccountRepositoryAdapter adapter;
 
     @BeforeEach
     void setUp() {
-        adapter = new AccountRepositoryAdapter(accountJpaRepository);
+        adapter = new AccountRepositoryAdapter(accountJpaRepository, accountTypeRepository, accountStatusRepository);
     }
 
     @Test

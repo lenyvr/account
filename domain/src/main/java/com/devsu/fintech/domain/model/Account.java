@@ -50,4 +50,13 @@ public class Account {
 
     public OffsetDateTime getLastChangeDate() { return lastChangeDate; }
     public void setLastChangeDate(OffsetDateTime lastChangeDate) { this.lastChangeDate = lastChangeDate; }
+
+    private String accountTypeName;
+    private String accountStatusName;
+
+    public String getAccountTypeName() { return accountTypeName; }
+    public void setAccountTypeName(String accountTypeName) { this.accountTypeName = accountTypeName; }
+
+    public String getAccountStatusName() { return accountStatusName; }
+    public void setAccountStatusName(String accountStatusName) { this.accountStatusName = accountStatusName; }
 }
