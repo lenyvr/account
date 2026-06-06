@@ -6,7 +6,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(name = "account_type")
 public class AccountTypeEntity {
@@ -19,6 +21,4 @@ public class AccountTypeEntity {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    public Integer getAccountTypeId() { return accountTypeId; }
-    public String getName() { return name; }
 }

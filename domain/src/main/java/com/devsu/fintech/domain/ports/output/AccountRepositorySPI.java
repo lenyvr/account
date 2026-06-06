@@ -24,4 +24,6 @@ public interface AccountRepositorySPI {
     Optional<Account> findById(Long accountId);
 
     List<Account> findByClientId(Long clientId);
+
+    void accountHasValidAccountType(Account account);
 }

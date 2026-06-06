@@ -22,6 +22,7 @@ public class CreateAccountUseCase implements CreateAccountInputPort {
 
     @Override
     public Account execute(Account account) {
+        accountRepositorySPI.accountHasValidAccountType(account);
         if (!clientVerificationSPI.existsClient(account.getClientId())) {
             throw new ClientNotFoundException(account.getClientId());
         }
@@ -35,4 +36,5 @@ public class CreateAccountUseCase implements CreateAccountInputPort {
 
         return accountRepositorySPI.save(account);
     }
+
 }

@@ -83,7 +83,7 @@ docker-compose up --build
 # Database only
 docker-compose up devsu-account-db
 
-# Messaging only
+# Messaging only: You must verify that the `client` service has not already opened the messaging queue to avoid conflicts.
 docker-compose up devsu-fintech-queue
 ```
 

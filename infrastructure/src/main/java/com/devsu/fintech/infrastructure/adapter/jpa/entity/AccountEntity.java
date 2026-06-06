@@ -6,6 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.Generated;
+import org.hibernate.generator.EventType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -40,12 +42,15 @@ public class AccountEntity {
     @Column(name = "expiry_deposit_date")
     private LocalDate expiryDepositDate;
 
+    @Generated(event = EventType.INSERT)
     @Column(name = "created_date", insertable = false, updatable = false)
     private OffsetDateTime createdDate;
 
+    @Generated(event = {EventType.INSERT, EventType.UPDATE})
     @Column(name = "last_status_date", insertable = false, updatable = false)
     private OffsetDateTime lastStatusDate;
 
+    @Generated(event = {EventType.INSERT, EventType.UPDATE})
     @Column(name = "last_change_date", insertable = false, updatable = false)
     private OffsetDateTime lastChangeDate;
 

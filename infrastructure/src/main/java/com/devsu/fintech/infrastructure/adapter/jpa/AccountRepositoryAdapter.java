@@ -55,6 +55,12 @@ public class AccountRepositoryAdapter implements AccountRepositorySPI {
     }
 
     @Override
+    public void accountHasValidAccountType(Account account) {
+        accountTypeRepository.findById(account.getAccountTypeId())
+                .orElseThrow(() -> new IllegalArgumentException("Account type " + account.getAccountTypeId()+" is not valid."));
+    }
+
+    @Override
     public Optional<Account> findByAccountNumber(String accountNumber) {
         return jpaRepository.findByAccountNumber(accountNumber).map(this::toDomain);
     }
@@ -184,4 +190,6 @@ public class AccountRepositoryAdapter implements AccountRepositorySPI {
         account.setLastChangeDate(entity.getLastChangeDate());
         return account;
     }
+
+
 }
