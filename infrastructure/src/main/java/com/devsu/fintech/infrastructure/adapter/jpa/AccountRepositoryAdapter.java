@@ -6,6 +6,8 @@ import com.devsu.fintech.infrastructure.adapter.jpa.entity.AccountEntity;
 import com.devsu.fintech.infrastructure.adapter.jpa.repository.AccountJpaRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class AccountRepositoryAdapter implements AccountRepositorySPI {
 
@@ -24,6 +26,17 @@ public class AccountRepositoryAdapter implements AccountRepositorySPI {
 
     @Override
     public Account save(Account account) {
+        AccountEntity saved = jpaRepository.save(toEntity(account));
+        return toDomain(saved);
+    }
+
+    @Override
+    public Optional<Account> findByAccountNumber(String accountNumber) {
+        return jpaRepository.findByAccountNumber(accountNumber).map(this::toDomain);
+    }
+
+    @Override
+    public Account update(Account account) {
         AccountEntity saved = jpaRepository.save(toEntity(account));
         return toDomain(saved);
     }

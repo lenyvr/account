@@ -78,7 +78,7 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
     - Implement the logic to send an RPC message to verify `client_id` existence.
     - Create the REST Controller (Web Adapter) and JPA Adapter.
 
-- [ ] Implement "Update Account" Use Case:
+- [x] Implement "Update Account" Use Case:
     - Follow Hexagonal layers. Enforce the business rules avoiding manual state changes to DORMANT or CLOSED.
 
 - [ ] Implement "List Accounts" Use Case:

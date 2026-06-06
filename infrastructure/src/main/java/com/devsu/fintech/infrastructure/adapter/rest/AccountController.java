@@ -1,14 +1,19 @@
 package com.devsu.fintech.infrastructure.adapter.rest;
 
 import com.devsu.fintech.application.port.input.CreateAccountInputPort;
+import com.devsu.fintech.application.port.input.UpdateAccountInputPort;
 import com.devsu.fintech.domain.model.Account;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.CreateAccountRequestDTO;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.CreateAccountResponseDTO;
+import com.devsu.fintech.infrastructure.adapter.rest.dto.UpdateAccountRequestDTO;
+import com.devsu.fintech.infrastructure.adapter.rest.dto.UpdateAccountResponseDTO;
 import com.devsu.fintech.infrastructure.adapter.rest.mapper.AccountMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,9 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccountController {
 
     private final CreateAccountInputPort createAccountInputPort;
+    private final UpdateAccountInputPort updateAccountInputPort;
 
-    public AccountController(CreateAccountInputPort createAccountInputPort) {
+    public AccountController(CreateAccountInputPort createAccountInputPort,
+                             UpdateAccountInputPort updateAccountInputPort) {
         this.createAccountInputPort = createAccountInputPort;
+        this.updateAccountInputPort = updateAccountInputPort;
     }
 
     @PostMapping
@@ -36,5 +44,18 @@ public class AccountController {
         Account account = AccountMapper.toDomain(request);
         Account created = createAccountInputPort.execute(account);
         return AccountMapper.toResponseDTO(created);
+    }
+
+    @PatchMapping("/{accountNumber}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Update an existing account's status or expiry date")
+    @ApiResponse(responseCode = "200", description = "Account updated successfully")
+    @ApiResponse(responseCode = "404", description = "Account not found")
+    @ApiResponse(responseCode = "422", description = "Business rule violation")
+    public UpdateAccountResponseDTO updateAccount(@PathVariable String accountNumber,
+                                                  @RequestBody UpdateAccountRequestDTO request) {
+        Account updated = updateAccountInputPort.execute(
+                accountNumber, request.accountStatusId(), request.expiryDepositDate());
+        return AccountMapper.toUpdateResponseDTO(updated);
     }
 }
