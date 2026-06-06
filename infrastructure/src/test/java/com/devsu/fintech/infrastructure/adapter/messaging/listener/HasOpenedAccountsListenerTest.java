@@ -29,27 +29,27 @@ class HasOpenedAccountsListenerTest {
 
     @Test
     void shouldReturnTrueResponseWhenClientHasOpenAccounts() {
-        when(hasOpenedAccountsInputPort.execute(10)).thenReturn(true);
+        when(hasOpenedAccountsInputPort.execute(10L)).thenReturn(true);
 
-        CheckAccountResponseDTO response = listener.handle(new CheckAccountRequestDTO(10));
+        CheckAccountResponseDTO response = listener.handle(new CheckAccountRequestDTO(10L));
 
-        assertTrue(response.hasOpenedAccounts());
-        verify(hasOpenedAccountsInputPort).execute(10);
+        assertTrue(response.hasOpenAccounts());
+        verify(hasOpenedAccountsInputPort).execute(10L);
     }
 
     @Test
     void shouldReturnFalseResponseWhenClientHasNoOpenAccounts() {
-        when(hasOpenedAccountsInputPort.execute(20)).thenReturn(false);
+        when(hasOpenedAccountsInputPort.execute(20L)).thenReturn(false);
 
-        CheckAccountResponseDTO response = listener.handle(new CheckAccountRequestDTO(20));
+        CheckAccountResponseDTO response = listener.handle(new CheckAccountRequestDTO(20L));
 
-        assertFalse(response.hasOpenedAccounts());
-        verify(hasOpenedAccountsInputPort).execute(20);
+        assertFalse(response.hasOpenAccounts());
+        verify(hasOpenedAccountsInputPort).execute(20L);
     }
 
     @Test
     void shouldDelegateClientIdToInputPortWithoutModification() {
-        Integer clientId = 99;
+        Long clientId = 99L;
         when(hasOpenedAccountsInputPort.execute(clientId)).thenReturn(true);
 
         listener.handle(new CheckAccountRequestDTO(clientId));

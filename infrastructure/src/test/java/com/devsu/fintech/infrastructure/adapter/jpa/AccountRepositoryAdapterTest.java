@@ -55,7 +55,7 @@ class AccountRepositoryAdapterTest {
     void shouldReturnTrueWhenClientHasActiveAccount() {
         accountJpaRepository.save(buildAccount("ACC-001", 1L, 2)); // ACTIVE
 
-        assertTrue(adapter.hasOpenedAccounts(1));
+        assertTrue(adapter.hasOpenedAccounts(1L));
     }
 
     @Test
@@ -63,7 +63,7 @@ class AccountRepositoryAdapterTest {
         accountJpaRepository.save(buildAccount("ACC-002", 2L, 5)); // CLOSED
         accountJpaRepository.save(buildAccount("ACC-003", 2L, 3)); // BLOCKED
 
-        assertTrue(adapter.hasOpenedAccounts(2));
+        assertTrue(adapter.hasOpenedAccounts(2L));
     }
 
     @Test
@@ -71,12 +71,12 @@ class AccountRepositoryAdapterTest {
         accountJpaRepository.save(buildAccount("ACC-004", 3L, 5)); // CLOSED
         accountJpaRepository.save(buildAccount("ACC-005", 3L, 5)); // CLOSED
 
-        assertFalse(adapter.hasOpenedAccounts(3));
+        assertFalse(adapter.hasOpenedAccounts(3L));
     }
 
     @Test
     void shouldReturnFalseWhenClientHasNoAccounts() {
-        assertFalse(adapter.hasOpenedAccounts(999));
+        assertFalse(adapter.hasOpenedAccounts(999L));
     }
 
     private AccountEntity buildAccount(String accountNumber, Long clientId, Integer statusId) {

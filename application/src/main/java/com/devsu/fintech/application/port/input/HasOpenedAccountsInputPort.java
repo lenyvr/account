@@ -2,5 +2,5 @@ package com.devsu.fintech.application.port.input;
 
 public interface HasOpenedAccountsInputPort {
 
-    boolean execute(Integer clientId);
+    boolean execute(Long clientId);
 }

@@ -27,25 +27,25 @@ class HasOpenedAccountsUseCaseTest {
 
     @Test
     void shouldReturnTrueWhenClientHasAtLeastOneOpenAccount() {
-        when(accountRepositorySPI.hasOpenedAccounts(1)).thenReturn(true);
+        when(accountRepositorySPI.hasOpenedAccounts(1L)).thenReturn(true);
 
-        assertTrue(useCase.execute(1));
-        verify(accountRepositorySPI).hasOpenedAccounts(1);
+        assertTrue(useCase.execute(1L));
+        verify(accountRepositorySPI).hasOpenedAccounts(1L);
     }
 
     @Test
     void shouldReturnFalseWhenClientHasNoAccounts() {
-        when(accountRepositorySPI.hasOpenedAccounts(2)).thenReturn(false);
+        when(accountRepositorySPI.hasOpenedAccounts(2L)).thenReturn(false);
 
-        assertFalse(useCase.execute(2));
-        verify(accountRepositorySPI).hasOpenedAccounts(2);
+        assertFalse(useCase.execute(2L));
+        verify(accountRepositorySPI).hasOpenedAccounts(2L);
     }
 
     @Test
     void shouldReturnFalseWhenClientHasOnlyClosedAccounts() {
-        when(accountRepositorySPI.hasOpenedAccounts(3)).thenReturn(false);
+        when(accountRepositorySPI.hasOpenedAccounts(3L)).thenReturn(false);
 
-        assertFalse(useCase.execute(3));
-        verify(accountRepositorySPI).hasOpenedAccounts(3);
+        assertFalse(useCase.execute(3L));
+        verify(accountRepositorySPI).hasOpenedAccounts(3L);
     }
 }

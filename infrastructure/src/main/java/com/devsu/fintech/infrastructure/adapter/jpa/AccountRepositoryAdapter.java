@@ -18,7 +18,7 @@ public class AccountRepositoryAdapter implements AccountRepositorySPI {
     }
 
     @Override
-    public boolean hasOpenedAccounts(Integer clientId) {
+    public boolean hasOpenedAccounts(Long clientId) {
         return jpaRepository.existsByClientIdAndAccountStatusIdNot(clientId, CLOSED_STATUS_ID);
     }
 
