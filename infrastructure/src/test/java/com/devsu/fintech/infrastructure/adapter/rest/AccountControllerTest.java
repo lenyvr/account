@@ -16,7 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -112,7 +112,7 @@ class AccountControllerTest {
         account.setAccountStatusId(1);
         account.setClientId(1L);
         account.setAccountTypeId(1);
-        account.setCreatedDate(LocalDate.now());
+        account.setCreatedDate(OffsetDateTime.now());
         return account;
     }
 }

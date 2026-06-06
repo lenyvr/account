@@ -2,6 +2,7 @@ package com.devsu.fintech.infrastructure.adapter.rest.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 public record CreateAccountResponseDTO(
         Long accountId,
@@ -12,5 +13,5 @@ public record CreateAccountResponseDTO(
         Long clientId,
         Integer accountTypeId,
         LocalDate expiryDepositDate,
-        LocalDate createdDate
+        OffsetDateTime createdDate
 ) {}

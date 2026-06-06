@@ -2,6 +2,7 @@ package com.devsu.fintech.domain.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 public class Account {
 
@@ -13,9 +14,9 @@ public class Account {
     private Long clientId;
     private Integer accountTypeId;
     private LocalDate expiryDepositDate;
-    private LocalDate createdDate;
-    private LocalDate lastStatusDate;
-    private LocalDate lastChangeDate;
+    private OffsetDateTime createdDate;
+    private OffsetDateTime lastStatusDate;
+    private OffsetDateTime lastChangeDate;
 
     public Long getAccountId() { return accountId; }
     public void setAccountId(Long accountId) { this.accountId = accountId; }
@@ -41,12 +42,12 @@ public class Account {
     public LocalDate getExpiryDepositDate() { return expiryDepositDate; }
     public void setExpiryDepositDate(LocalDate expiryDepositDate) { this.expiryDepositDate = expiryDepositDate; }
 
-    public LocalDate getCreatedDate() { return createdDate; }
-    public void setCreatedDate(LocalDate createdDate) { this.createdDate = createdDate; }
+    public OffsetDateTime getCreatedDate() { return createdDate; }
+    public void setCreatedDate(OffsetDateTime createdDate) { this.createdDate = createdDate; }
 
-    public LocalDate getLastStatusDate() { return lastStatusDate; }
-    public void setLastStatusDate(LocalDate lastStatusDate) { this.lastStatusDate = lastStatusDate; }
+    public OffsetDateTime getLastStatusDate() { return lastStatusDate; }
+    public void setLastStatusDate(OffsetDateTime lastStatusDate) { this.lastStatusDate = lastStatusDate; }
 
-    public LocalDate getLastChangeDate() { return lastChangeDate; }
-    public void setLastChangeDate(LocalDate lastChangeDate) { this.lastChangeDate = lastChangeDate; }
+    public OffsetDateTime getLastChangeDate() { return lastChangeDate; }
+    public void setLastChangeDate(OffsetDateTime lastChangeDate) { this.lastChangeDate = lastChangeDate; }
 }
