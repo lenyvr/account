@@ -15,6 +15,11 @@ spring:
     defer-datasource-initialization: true
     open-in-view: false
     show-sql: false
+  rabbitmq:
+    host: ${RBQ_HOST}
+    port: ${RBQ_PORT}
+    username: ${RBQ_USER}
+    password: ${RBQ_PASSWORD}
   sql:
     init:
       # Run schema.sql (DDL) and data.sql (catalogs + demo data) on startup.
