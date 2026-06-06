@@ -1,9 +1,11 @@
 package com.devsu.fintech.infrastructure.adapter.rest.mapper;
 
 import com.devsu.fintech.domain.model.Account;
+import com.devsu.fintech.domain.model.DeactivationResult;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.AccountListItemDTO;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.CreateAccountRequestDTO;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.CreateAccountResponseDTO;
+import com.devsu.fintech.infrastructure.adapter.rest.dto.DeactivateAccountResponseDTO;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.UpdateAccountResponseDTO;
 
 public class AccountMapper {
@@ -45,6 +47,18 @@ public class AccountMapper {
                 account.getAccountTypeName(),
                 account.getExpiryDepositDate(),
                 account.getCreatedDate()
+        );
+    }
+
+    public static DeactivateAccountResponseDTO toDeactivateResponseDTO(DeactivationResult result) {
+        Account account = result.account();
+        return new DeactivateAccountResponseDTO(
+                account.getAccountId(),
+                account.getAccountNumber(),
+                account.getAccountStatusId(),
+                account.getBalance(),
+                result.refundedAmount(),
+                account.getLastStatusDate()
         );
     }
 

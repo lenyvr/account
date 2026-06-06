@@ -1,14 +1,18 @@
 package com.devsu.fintech.infrastructure.adapter.rest;
 
 import com.devsu.fintech.application.port.input.CreateAccountInputPort;
+import com.devsu.fintech.application.port.input.DeactivateAccountInputPort;
 import com.devsu.fintech.application.port.input.ListAccountsInputPort;
 import com.devsu.fintech.application.port.input.UpdateAccountInputPort;
 import com.devsu.fintech.domain.exception.AccountClosedException;
 import com.devsu.fintech.domain.exception.AccountClosureNotAllowedViaUpdateException;
 import com.devsu.fintech.domain.exception.AccountNotFoundException;
 import com.devsu.fintech.domain.exception.ClientNotFoundException;
+import com.devsu.fintech.domain.exception.InvalidRefundMethodException;
+import com.devsu.fintech.domain.exception.TargetAccountRequiredException;
 import com.devsu.fintech.domain.model.Account;
 import com.devsu.fintech.domain.model.AccountPage;
+import com.devsu.fintech.domain.model.DeactivationResult;
 import com.devsu.fintech.infrastructure.exception.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -30,6 +34,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -51,6 +56,9 @@ class AccountControllerTest {
 
     @MockitoBean
     private ListAccountsInputPort listAccountsInputPort;
+
+    @MockitoBean
+    private DeactivateAccountInputPort deactivateAccountInputPort;
 
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
@@ -206,6 +214,87 @@ class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.currentPage").value(2))
                 .andExpect(jsonPath("$.pageSize").value(5));
+    }
+
+    // ---- DELETE /accounts/{accountNumber} ----
+
+    @Test
+    void shouldReturn200WhenAccountDeactivatedWithNoBalance() throws Exception {
+        Account closed = buildUpdatedAccount("ACC-001", 5);
+        closed.setBalance(BigDecimal.ZERO);
+        DeactivationResult result = new DeactivationResult(closed, BigDecimal.ZERO);
+        when(deactivateAccountInputPort.execute(eq("ACC-001"), eq("withdrawal"), any()))
+                .thenReturn(result);
+
+        mockMvc.perform(delete("/accounts/ACC-001")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"refundMethod\": \"withdrawal\" }"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accountNumber").value("ACC-001"))
+                .andExpect(jsonPath("$.accountStatusId").value(5))
+                .andExpect(jsonPath("$.refundedAmount").value(0));
+    }
+
+    @Test
+    void shouldReturn200WhenAccountDeactivatedWithRefund() throws Exception {
+        Account closed = buildUpdatedAccount("ACC-002", 5);
+        closed.setBalance(BigDecimal.ZERO);
+        DeactivationResult result = new DeactivationResult(closed, new BigDecimal("500.00"));
+        when(deactivateAccountInputPort.execute(eq("ACC-002"), eq("withdrawal"), any()))
+                .thenReturn(result);
+
+        mockMvc.perform(delete("/accounts/ACC-002")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"refundMethod\": \"withdrawal\" }"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.refundedAmount").value(500.00));
+    }
+
+    @Test
+    void shouldReturn404WhenDeactivatingNonExistentAccount() throws Exception {
+        when(deactivateAccountInputPort.execute(anyString(), anyString(), any()))
+                .thenThrow(new AccountNotFoundException("UNKNOWN"));
+
+        mockMvc.perform(delete("/accounts/UNKNOWN")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"refundMethod\": \"withdrawal\" }"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturn422WhenDeactivatingAlreadyClosedAccount() throws Exception {
+        when(deactivateAccountInputPort.execute(anyString(), anyString(), any()))
+                .thenThrow(new AccountClosedException("ACC-CLOSED"));
+
+        mockMvc.perform(delete("/accounts/ACC-CLOSED")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"refundMethod\": \"withdrawal\" }"))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.message").exists());
+    }
+
+    @Test
+    void shouldReturn422WhenInvalidRefundMethod() throws Exception {
+        when(deactivateAccountInputPort.execute(anyString(), anyString(), any()))
+                .thenThrow(new InvalidRefundMethodException("cash"));
+
+        mockMvc.perform(delete("/accounts/ACC-001")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"refundMethod\": \"cash\" }"))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.message").exists());
+    }
+
+    @Test
+    void shouldReturn422WhenTransferWithoutTargetAccount() throws Exception {
+        when(deactivateAccountInputPort.execute(anyString(), anyString(), any()))
+                .thenThrow(new TargetAccountRequiredException());
+
+        mockMvc.perform(delete("/accounts/ACC-001")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"refundMethod\": \"transfer\" }"))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.message").exists());
     }
 
     // ---- Helpers ----

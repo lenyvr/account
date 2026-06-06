@@ -1,10 +1,12 @@
 package com.devsu.fintech.infrastructure.config;
 
 import com.devsu.fintech.application.port.input.CreateAccountInputPort;
+import com.devsu.fintech.application.port.input.DeactivateAccountInputPort;
 import com.devsu.fintech.application.port.input.HasOpenedAccountsInputPort;
 import com.devsu.fintech.application.port.input.ListAccountsInputPort;
 import com.devsu.fintech.application.port.input.UpdateAccountInputPort;
 import com.devsu.fintech.application.usecase.CreateAccountUseCase;
+import com.devsu.fintech.application.usecase.DeactivateAccountUseCase;
 import com.devsu.fintech.application.usecase.HasOpenedAccountsUseCase;
 import com.devsu.fintech.application.usecase.ListAccountsUseCase;
 import com.devsu.fintech.application.usecase.UpdateAccountUseCase;
@@ -35,5 +37,10 @@ public class BeanConfiguration {
     @Bean
     public ListAccountsInputPort listAccountsUseCase(AccountRepositorySPI accountRepositorySPI) {
         return new ListAccountsUseCase(accountRepositorySPI);
+    }
+
+    @Bean
+    public DeactivateAccountInputPort deactivateAccountUseCase(AccountRepositorySPI accountRepositorySPI) {
+        return new DeactivateAccountUseCase(accountRepositorySPI);
     }
 }

@@ -85,7 +85,7 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
     - Build a dynamic query mechanism (e.g., JPA Specifications or QueryDSL) to handle the optional filters and pagination.
     - Map the lookup IDs to their readable String names in the Response DTO.
 
-- [ ] Implement "Deactivate Account" Use Case:
+- [x] Implement "Deactivate Account" Use Case:
     - Implement a transactional boundary (`@Transactional`).
     - Handle the zero-balance enforcement by generating the corresponding withdrawal/transfer transaction before 
       changing the status to CLOSED.

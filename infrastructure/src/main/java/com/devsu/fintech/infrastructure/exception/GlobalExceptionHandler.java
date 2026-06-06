@@ -5,6 +5,8 @@ import com.devsu.fintech.domain.exception.AccountClosureNotAllowedViaUpdateExcep
 import com.devsu.fintech.domain.exception.AccountNotFoundException;
 import com.devsu.fintech.domain.exception.ClientNotFoundException;
 import com.devsu.fintech.domain.exception.InvalidDormantTransitionException;
+import com.devsu.fintech.domain.exception.InvalidRefundMethodException;
+import com.devsu.fintech.domain.exception.TargetAccountRequiredException;
 import com.devsu.fintech.infrastructure.adapter.rest.dto.ErrorResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +31,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
         AccountClosedException.class,
         AccountClosureNotAllowedViaUpdateException.class,
-        InvalidDormantTransitionException.class
+        InvalidDormantTransitionException.class,
+        InvalidRefundMethodException.class,
+        TargetAccountRequiredException.class
     })
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ErrorResponseDTO handleBusinessRuleViolation(RuntimeException ex) {
