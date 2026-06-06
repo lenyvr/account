@@ -22,6 +22,11 @@ spring:
     port: ${RBQ_PORT}
     username: ${RBQ_USER}
     password: ${RBQ_PASSWORD}
+
+rabbitmq:
+  clients:
+    exchange: clients.exchange
+    verify-routing-key: clients.verify-request
   sql:
     init:
       # Run schema.sql (DDL) and data.sql (catalogs + demo data) on startup.
