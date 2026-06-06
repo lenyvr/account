@@ -14,9 +14,13 @@ repositories {
 dependencies {
     implementation(project(":application"))
     implementation(project(":domain"))
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     runtimeOnly("org.postgresql:postgresql")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")

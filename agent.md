@@ -59,7 +59,7 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
 
 **Tasks to be done:**
 
-- [ ] Create `hasOpenedAccounts` RabbitMQ Listener: This service must act as an RPC Consumer to check a client's 
+- [x] Create `hasOpenedAccounts` RabbitMQ Listener: This service must act as an RPC Consumer to check a client's 
    account status.
     - **1. DTO Creation:** Create the `RequestDTO` (containing a `client_id` number) and a `ResponseDTO` 
         (boolean result) to handle the message payload.
