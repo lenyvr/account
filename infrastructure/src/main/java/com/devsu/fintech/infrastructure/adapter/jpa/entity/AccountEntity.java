@@ -33,7 +33,7 @@ public class AccountEntity {
     private Integer accountStatusId;
 
     @Column(name = "client_id", nullable = false)
-    private Integer clientId;
+    private Long clientId;
 
     @Column(name = "account_type_id", nullable = false)
     private Integer accountTypeId;
@@ -65,8 +65,8 @@ public class AccountEntity {
     public Integer getAccountStatusId() { return accountStatusId; }
     public void setAccountStatusId(Integer accountStatusId) { this.accountStatusId = accountStatusId; }
 
-    public Integer getClientId() { return clientId; }
-    public void setClientId(Integer clientId) { this.clientId = clientId; }
+    public Long getClientId() { return clientId; }
+    public void setClientId(Long clientId) { this.clientId = clientId; }
 
     public Integer getAccountTypeId() { return accountTypeId; }
     public void setAccountTypeId(Integer accountTypeId) { this.accountTypeId = accountTypeId; }

@@ -53,23 +53,23 @@ class AccountRepositoryAdapterTest {
 
     @Test
     void shouldReturnTrueWhenClientHasActiveAccount() {
-        accountJpaRepository.save(buildAccount("ACC-001", 1, 2)); // ACTIVE
+        accountJpaRepository.save(buildAccount("ACC-001", 1L, 2)); // ACTIVE
 
         assertTrue(adapter.hasOpenedAccounts(1));
     }
 
     @Test
     void shouldReturnTrueWhenClientHasNonClosedAccountAmongMany() {
-        accountJpaRepository.save(buildAccount("ACC-002", 2, 5)); // CLOSED
-        accountJpaRepository.save(buildAccount("ACC-003", 2, 3)); // BLOCKED
+        accountJpaRepository.save(buildAccount("ACC-002", 2L, 5)); // CLOSED
+        accountJpaRepository.save(buildAccount("ACC-003", 2L, 3)); // BLOCKED
 
         assertTrue(adapter.hasOpenedAccounts(2));
     }
 
     @Test
     void shouldReturnFalseWhenClientHasOnlyClosedAccounts() {
-        accountJpaRepository.save(buildAccount("ACC-004", 3, 5)); // CLOSED
-        accountJpaRepository.save(buildAccount("ACC-005", 3, 5)); // CLOSED
+        accountJpaRepository.save(buildAccount("ACC-004", 3L, 5)); // CLOSED
+        accountJpaRepository.save(buildAccount("ACC-005", 3L, 5)); // CLOSED
 
         assertFalse(adapter.hasOpenedAccounts(3));
     }
@@ -79,7 +79,7 @@ class AccountRepositoryAdapterTest {
         assertFalse(adapter.hasOpenedAccounts(999));
     }
 
-    private AccountEntity buildAccount(String accountNumber, Integer clientId, Integer statusId) {
+    private AccountEntity buildAccount(String accountNumber, Long clientId, Integer statusId) {
         AccountEntity account = new AccountEntity();
         account.setAccountNumber(accountNumber);
         account.setClientId(clientId);
