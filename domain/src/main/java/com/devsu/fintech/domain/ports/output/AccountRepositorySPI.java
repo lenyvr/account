@@ -19,4 +19,6 @@ public interface AccountRepositorySPI {
     AccountPage listAccounts(AccountFilter filter, int page, int size);
 
     Account deactivate(Account account, Transaction refundTransaction);
+
+    Optional<Account> findById(Long accountId);
 }

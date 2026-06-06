@@ -105,6 +105,11 @@ public class AccountRepositoryAdapter implements AccountRepositorySPI {
     }
 
     @Override
+    public Optional<Account> findById(Long accountId) {
+        return jpaRepository.findById(accountId).map(this::toDomain);
+    }
+
+    @Override
     @Transactional
     public Account deactivate(Account account, Transaction refundTransaction) {
         if (refundTransaction != null) {
