@@ -4,6 +4,7 @@ import com.devsu.fintech.domain.model.Account;
 import com.devsu.fintech.domain.model.AccountFilter;
 import com.devsu.fintech.domain.model.AccountPage;
 import com.devsu.fintech.domain.model.Transaction;
+import java.util.List;
 import java.util.Optional;
 
 public interface AccountRepositorySPI {
@@ -21,4 +22,6 @@ public interface AccountRepositorySPI {
     Account deactivate(Account account, Transaction refundTransaction);
 
     Optional<Account> findById(Long accountId);
+
+    List<Account> findByClientId(Long clientId);
 }

@@ -110,6 +110,17 @@ public class AccountRepositoryAdapter implements AccountRepositorySPI {
     }
 
     @Override
+    public java.util.List<Account> findByClientId(Long clientId) {
+        Map<Integer, String> typeNames = accountTypeRepository.findAll().stream()
+                .collect(Collectors.toMap(AccountTypeEntity::getAccountTypeId, AccountTypeEntity::getName));
+        Map<Integer, String> statusNames = accountStatusRepository.findAll().stream()
+                .collect(Collectors.toMap(AccountStatusEntity::getAccountStatusId, AccountStatusEntity::getName));
+        return jpaRepository.findByClientId(clientId).stream()
+                .map(entity -> toDomainWithNames(entity, typeNames, statusNames))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public Account deactivate(Account account, Transaction refundTransaction) {
         if (refundTransaction != null) {

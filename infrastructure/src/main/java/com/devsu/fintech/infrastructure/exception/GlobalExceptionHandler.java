@@ -45,9 +45,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ClientNotFoundException.class)
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponseDTO handleClientNotFound(ClientNotFoundException ex) {
-        log.error("Client verification failed: {}", ex.getMessage());
+        log.error("Client not found: {}", ex.getMessage());
         return new ErrorResponseDTO(ex.getMessage());
     }
 
