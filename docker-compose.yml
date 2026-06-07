@@ -6,8 +6,9 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - "${DB_PORT}:5432"
+      - "${DB_EXTERNAL_PORT}:5432"
     volumes:
       - ./data_db:/var/lib/postgresql
     networks:
@@ -16,7 +17,7 @@ services:
     build: .
     container_name: devsu-account-app
     ports:
-      - "${APP_PORT}:8080"
+      - "${APP_EXTERNAL_PORT}:${APP_PORT}"
     env_file:
       - .env
     depends_on:

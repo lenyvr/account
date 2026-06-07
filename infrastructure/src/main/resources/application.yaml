@@ -1,5 +1,6 @@
 server:
   port: ${APP_PORT}
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -30,6 +31,8 @@ spring:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
 
 rabbitmq:
   clients:
